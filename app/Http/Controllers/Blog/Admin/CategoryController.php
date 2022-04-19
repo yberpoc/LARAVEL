@@ -16,8 +16,7 @@ class CategoryController extends BaseController
     public function index()
     {
         $paginator = BlogCategory::paginate(5);
-
-        return view('blog.admin.category.index', compact('paginator'));
+        return view('blog.admin.categories.index', compact('paginator'));
     }
 
     /**
@@ -49,7 +48,11 @@ class CategoryController extends BaseController
      */
     public function edit($id)
     {
-        dd(__METHOD__);
+        $item = BlogCategory::findOrFail($id);
+        $categoryList = BlogCategory::all();
+
+        return view('blog.admin.categories.edit',
+            compact('item', 'categoryList'));
     }
 
     /**
@@ -61,6 +64,42 @@ class CategoryController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        dd(__METHOD__);
+        $rules = [
+            'title' => 'required|min:5|max:200',
+            'slug' => 'max:200',
+            'description' => 'string|max:500|min:3',
+            'parent_id' => 'required|integer|exists:blog_categories,id',
+        ];
+
+        //$validateData = $request->validate($rules);
+
+        $validator = \Validator::make($request->all(), $rules);
+        $validateData[] = $validator->passes();
+        $validateData[] = $validator->valid();
+        $validateData[] = $validator->failed();
+        $validateData[] = $validator->errors();
+        $validateData[] = $validator->fails();
+
+        dd($validateData);
+
+        $item = BlogCategory::find($id);
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Запись id = [{$id}] не найдена"])
+                ->withInput();
+        }
+
+        $data = $request->all();
+        $result = $item->fill($data)->save();
+
+        if($result) {
+            return redirect()
+                ->route('blog.admin.categories.edit', $item->id)
+                ->with(['success' => 'Успешно сохранено']);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Ошибка сохранения'])
+                ->withInput();
+        }
     }
 }
