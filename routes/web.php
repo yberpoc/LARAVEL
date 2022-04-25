@@ -23,16 +23,22 @@ Route::group(['namespace' => 'App\Http\Controllers\Blog', 'prefix' => 'blog'], f
     Route::resource('posts', \App\Http\Controllers\Blog\PostController::class)->names('blog.post');
 });
 
+/** Админка блога **/
 $groupData = [
     'namespace' => 'App\Http\Controllers\Blog\Admin',
     'prefix' => 'admin/blog',
 ];
 Route::group($groupData, function (){
+    //BlogCategory
     $methods = ['index', 'edit', 'update', 'create', 'store'];
-   //Route::resource('categories', Catego)
     Route::resource('categories', \App\Http\Controllers\Blog\Admin\CategoryController::class)
         ->only($methods)
         ->names('blog.admin.categories');
+
+    //BlogPost
+    Route::resource('posts', \App\Http\Controllers\Blog\Admin\PostController::class)
+        ->except(['show'])
+        ->names('blog.admin.posts');
 });
 
 
