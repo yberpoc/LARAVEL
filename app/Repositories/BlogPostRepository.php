@@ -36,7 +36,7 @@ class BlogPostRepository extends CoreRepository
         $result = $this
             ->startConditions()
             ->select($columns)
-            ->orderBy('id', 'ASC')
+            ->orderBy('id', 'desc')
             //->with(['category', 'user'])
             ->with([
                 'category' => function ($query)
@@ -62,5 +62,23 @@ class BlogPostRepository extends CoreRepository
     public function getEdit($id)
     {
         return $this->startConditions()->find($id);
+    }
+
+    public function getForComboBox()
+    {
+        //return $this->startConditions()->all();
+
+        $columns = implode(', ', [
+            'id',
+            'CONCAT (id, ". ", title) AS id_title',
+        ]);
+
+        $result = $this
+            ->startConditions()
+            ->selectRaw($columns)
+            ->toBase()
+            ->get();
+
+        return $result;
     }
 }

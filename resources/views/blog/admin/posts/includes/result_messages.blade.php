@@ -5,7 +5,12 @@
                 <button type="button" class="btn-close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">x</span>
                 </button>
-                {{ $errors->first() }}
+                <ul>
+                    @foreach($errors->all() as $errorTxt)
+                        <li>{{ $errorTxt }}</li>
+                    @endforeach
+                </ul>
+                {{--{{ $errors->first() }}--}}
             </div>
         </div>
     </div>
